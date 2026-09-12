@@ -1,0 +1,54 @@
+[Overview]
+
+## Choose an app
+GyrOSC: recommended for iPhone because it offers background mode.
+In GyrOSC settings, enable “run in background” and select 30 Hz (30 updates per second).
+phyphox: free on iPhone or Android; keep the app open and phone unlocked.
+
+## Get connected
+Use the same private Wi-Fi or phone hotspot.
+Follow your app's tab, then enable Motion Cues.
+Auto-detect selects the available feed after setup.
+
+## Phone position
+Flat: screen up, top edge forward.
+Upright: top edge up, screen facing you as you face forward.
+Secure the phone; match Phone position in the menu.
+
+Passenger use only. Stop if uncomfortable.
+
+[phyphox setup]
+
+## On your phone
+1. Open Acceleration (without g). Tap Play.
+2. Turn on Allow remote access; allow Local Network permission.
+3. Copy the shown http:// address, including its port.
+
+Keep phyphox open and the phone unlocked.
+
+## On your laptop
+4. Motion Cues > Phone address…: enter the phone's address.
+5. Choose Enable.
+
+No bubbles? Check Connection status, Play, and the phone address.
+
+[GyrOSC setup]
+
+## Required: firewall
+Allow incoming UDP from your phone to the laptop IP/port above. Not added automatically. Keep the firewall enabled.
+
+UFW example; replace every placeholder:
+sudo ufw allow in on INTERFACE proto udp from PHONE_IP to LAPTOP_IP port PORT
+
+Update the rule if addresses change; remove it when no longer needed.
+
+## In GyrOSC
+1. Enter the laptop's Wi-Fi/hotspot IP and port above, not the phone IP.
+2. Enable unscaled acceleration (/gyrosc/accel), default “gyrosc” tag.
+3. Allow Motion & Fitness and Local Network permissions.
+4. On the laptop, choose Motion Cues > Enable.
+
+## Recommended iPhone settings
+In GyrOSC settings, enable “run in background” and select 30 Hz (30 updates per second).
+Test other apps and locking; reliability varies. One update per second is too slow for this plugin.
+No bubbles? Check Connection status, IP/port, 30 Hz, and firewall.

@@ -1,0 +1,70 @@
+# Motion Cues
+
+## Motion at the edges. Room for your work.
+
+Motion Cues brings phone-driven motion bubbles to an Omarchy desktop.
+Twelve quiet bubbles sit near the edges. During a turn they flow, fade out,
+and reappear; stronger acceleration adds more. Their highlights follow the
+motion, and the center of the screen stays clear.
+
+![Short Motion Cues demonstration](media/motion-cues.gif)
+
+This 14-second demonstration uses the real `Bubble.qml`, `BubbleField.qml`,
+`BubbleFlow.js` and `MotionModel.js` with a simulated motion sequence. The
+backdrop is a presentation, not an additional settings screen. No private
+desktop, phone readings or network addresses are recorded.
+
+## What you get
+
+- Smooth peripheral movement, gently varied sizes and speeds, and soft fades.
+- Up to twenty additional bubbles during stronger motion.
+- Click-through overlays that do not take keyboard focus.
+- Automatic selection of an available GyrOSC or phyphox feed.
+- Explicit enable/disable, size and sensitivity controls, and a tabbed Setup guide.
+- No cloud service, stored sensor history, or always-running daemon when disabled.
+
+## Start with your phone
+
+**iPhone: GyrOSC is recommended because it offers background mode.** In its
+settings, enable **run in background** and select **30 Hz** (30 updates per
+second). Verify operation with other apps and the phone locked; background
+reliability varies. [GyrOSC](https://apps.apple.com/us/app/gyrosc/id418751595)
+
+**iPhone or Android: phyphox is a free alternative.** Keep its acceleration
+experiment running with the app open and phone unlocked.
+
+Connect both devices to the same trusted Wi-Fi or hotspot. GyrOSC requires an
+incoming UDP firewall exception if the laptop blocks unsolicited traffic.
+The plugin does not change firewall rules automatically.
+
+[Install and set up Motion Cues](../README.md#install-or-update)
+
+## Built to extend
+
+The sensor adapters, settings validation, motion filtering and particle animation
+are separate modules. The project includes protocol, lifecycle, installer and
+rendered integration tests, CI, and a reproducible release packager.
+
+[Architecture](ARCHITECTURE.md) · [Contributing](../CONTRIBUTING.md) · [Testing](TESTING.md)
+
+## A note on expectations
+
+This is an experimental visual aid, not a medically validated treatment or an
+Apple implementation. Use only as a passenger and stop if uncomfortable.
+Phone position is still selected manually. Physical validation has covered one
+iPhone and one monitor; Android, multiple monitors and locked-screen reliability
+need further real-device testing.
+
+## Recreate the demo
+
+The optional renderer needs a C++17 compiler, Qt 6 Quick development libraries,
+`pkg-config` and FFmpeg. These are not plugin runtime dependencies.
+
+```sh
+npm run demo
+```
+
+The renderer uses an offscreen window and deterministic motion. It never records
+your desktop. It replaces only the two demo assets in `docs/media/`.
+
+![Motion Cues showcase still](media/showcase.png)

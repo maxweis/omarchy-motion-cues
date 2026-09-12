@@ -1,0 +1,18 @@
+# Local state, backups and desktop captures must never enter a public checkout.
+backups*/
+*-history*/
+VERIFICATION.md
+motion-cues.json
+.env
+.env.*
+*.log
+*.jsonl
+*.png
+*.gif
+!docs/media/showcase.png
+!docs/media/motion-cues.gif
+*.mp4
+node_modules/
+dist/
+__pycache__/
+*.pyc

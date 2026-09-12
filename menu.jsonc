@@ -1,0 +1,128 @@
+{
+  "motion-cues": {
+    "icon": "󰘖",
+    "label": "Motion Cues",
+    "description": "Phone-driven, click-through motion bubbles",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" enabled"
+  },
+  "motion-cues.setup": {
+    "icon": "󰋖",
+    "label": "Setup",
+    "description": "What you need and how to connect your phone",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" setup"
+  },
+  "motion-cues.enable": {
+    "icon": "",
+    "label": "Enable",
+    "description": "Start reading phone motion and show bubbles",
+    "when": "! \"$HOME/.local/bin/omarchy-motion-cues\" enabled",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" enable"
+  },
+  "motion-cues.disable": {
+    "icon": "",
+    "label": "Disable",
+    "description": "Remove bubbles and stop reading the phone",
+    "when": "\"$HOME/.local/bin/omarchy-motion-cues\" enabled",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" disable"
+  },
+  "motion-cues.status": {
+    "icon": "",
+    "label": "Connection status",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" info"
+  },
+  "motion-cues.endpoint": {
+    "icon": "",
+    "label": "Phone address…",
+    "description": "Set the phyphox IP address and optional port",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" edit-endpoint"
+  },
+  "motion-cues.position": {
+    "icon": "",
+    "label": "Phone position",
+    "when": "\"$HOME/.local/bin/omarchy-motion-cues\" enabled"
+  },
+  "motion-cues.gyrosc-port": {
+    "icon": "󰒓",
+    "label": "GyrOSC port…",
+    "description": "Set the laptop UDP port to match GyrOSC",
+    "when": "\"$HOME/.local/bin/omarchy-motion-cues\" enabled",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" edit-gyrosc-port"
+  },
+  "motion-cues.app": {
+    "icon": "",
+    "label": "Motion app",
+    "description": "Detect the active feed automatically, or choose one",
+    "when": "\"$HOME/.local/bin/omarchy-motion-cues\" enabled"
+  },
+  "motion-cues.app.auto": {
+    "label": "Auto-detect (recommended)",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"provider\":\"auto\"}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting provider '\"auto\"'"
+  },
+  "motion-cues.app.phyphox": {
+    "label": "phyphox only",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"provider\":\"phyphox\"}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting provider '\"phyphox\"'"
+  },
+  "motion-cues.app.gyrosc": {
+    "label": "GyrOSC only",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"provider\":\"gyrosc\"}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting provider '\"gyrosc\"'"
+  },
+  "motion-cues.position.flat": {
+    "label": "Flat: screen up, top edge forward",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"mount\":\"flat\"}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting mount '\"flat\"'"
+  },
+  "motion-cues.position.upright": {
+    "label": "Upright: screen facing you",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"mount\":\"upright\"}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting mount '\"upright\"'"
+  },
+  "motion-cues.sensitivity": {
+    "icon": "󰒓",
+    "label": "Sensitivity",
+    "when": "\"$HOME/.local/bin/omarchy-motion-cues\" enabled"
+  },
+  "motion-cues.sensitivity.low": {
+    "label": "Gentle",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"sensitivity\":0.5}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting sensitivity '0.5'"
+  },
+  "motion-cues.sensitivity.normal": {
+    "label": "Normal",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"sensitivity\":1}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting sensitivity '1'"
+  },
+  "motion-cues.sensitivity.high": {
+    "label": "Strong",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"sensitivity\":1.6}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting sensitivity '1.6'"
+  },
+  "motion-cues.size": {
+    "icon": "",
+    "label": "Bubble size",
+    "when": "\"$HOME/.local/bin/omarchy-motion-cues\" enabled"
+  },
+  "motion-cues.size.small": {
+    "label": "Small",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"bubbleSize\":12}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting bubbleSize '12'"
+  },
+  "motion-cues.size.medium": {
+    "label": "Medium",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"bubbleSize\":18}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting bubbleSize '18'"
+  },
+  "motion-cues.size.large": {
+    "label": "Large",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" configure '{\"bubbleSize\":26}'",
+    "checked": "\"$HOME/.local/bin/omarchy-motion-cues\" is-setting bubbleSize '26'"
+  },
+  "motion-cues.reconnect": {
+    "icon": "󰑓",
+    "label": "Reconnect to phone",
+    "when": "\"$HOME/.local/bin/omarchy-motion-cues\" enabled",
+    "action": "\"$HOME/.local/bin/omarchy-motion-cues\" reconnect"
+  }
+}

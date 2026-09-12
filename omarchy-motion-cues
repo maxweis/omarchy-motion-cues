@@ -1,0 +1,164 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy"
+settings_file="$config_dir/motion-cues.json"
+script_dir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
+plugin_dir="$HOME/.config/omarchy/plugins/max.motion-cues"
+[[ ! -f "$script_dir/Endpoint.jq" ]] || plugin_dir="$script_dir"
+
+show_setup() {
+    [[ -r "$plugin_dir/SETUP.txt" && -r "$plugin_dir/setup_window.py" ]] || {
+        echo 'Motion Cues setup guide is missing.' >&2
+        return 1
+    }
+    [[ -x /usr/bin/python3 ]] || {
+        echo 'The Motion Cues setup window requires system Python, python-gobject and gtk4.' >&2
+        return 1
+    }
+    # A separate read-only window works even while the plugin is disabled.
+    # Closing or cancelling the guide must not enable it or change settings.
+    # Use system Python so a developer's virtual environment cannot hide GTK.
+    connection_details compact | /usr/bin/python3 -B "$plugin_dir/setup_window.py"
+}
+
+connection_details() {
+    local port addresses
+    port=$(jq -r '.gyroscPort // 9999' "$settings_file" 2>/dev/null || printf '9999')
+    addresses=$(ip -j -4 address show up 2>/dev/null | jq -r '
+        .[] | .ifname as $interface | .addr_info[]? | select(.scope == "global") |
+        "Destination IP: " + .local + " (" + $interface + ")"' || true)
+    if [[ ${1:-} == compact ]]; then
+        printf 'GyrOSC destination, UDP port: %s\n' "$port"
+        printf '%s\n' "${addresses:-No network address found. Connect to Wi-Fi or your phone hotspot.}"
+        return
+    fi
+    printf 'GYROSC DESTINATION ON THIS LAPTOP\nEnter these settings in GyrOSC on your phone:\n'
+    printf '%s\n' "${addresses:-  No network address found. Connect to Wi-Fi or your phone hotspot.}"
+    printf 'UDP port: %s\n' "$port"
+    printf 'Use this laptop\047s IP, not the phone\047s IP.\n'
+    printf 'Use the address for your shared Wi-Fi or hotspot, not a VPN or container.\n'
+}
+
+normalize_endpoint() {
+    jq -enr --arg url "$1" -f "$plugin_dir/Endpoint.jq"
+}
+
+save_endpoint() {
+    local endpoint temporary
+    endpoint=$(normalize_endpoint "$1") || {
+        echo 'Not saved. Use a private IP address, optionally with http:// and a port.' >&2
+        return 1
+    }
+    mkdir -p -- "$config_dir"
+    temporary=$(mktemp "$settings_file.XXXXXX")
+    # Read the current settings at save time, so a long-open prompt does not
+    # overwrite size, sensitivity or phone-position changes made meanwhile.
+    if [[ -f "$settings_file" ]]; then
+        if ! jq --arg url "$endpoint" 'if type == "object" then .url = $url else error("Invalid settings file") end' "$settings_file" > "$temporary"; then
+            rm -f -- "$temporary"
+            return 1
+        fi
+        chmod --reference="$settings_file" "$temporary"
+    else
+        jq -n --arg url "$endpoint" '{url:$url, mount:"flat", sensitivity:1, bubbleSize:26}' > "$temporary"
+    fi
+    if ! mv -- "$temporary" "$settings_file"; then
+        rm -f -- "$temporary"
+        return 1
+    fi
+    printf '%s\n' "$endpoint"
+}
+
+edit_endpoint() {
+    local current entered endpoint
+    current=$(jq -er '.url | select(type == "string" and length > 0)' "$settings_file" 2>/dev/null || printf '%s' 'not set')
+    entered=$(omarchy menu input "Phone address (current: $current)" --width 720) || return 0
+    if endpoint=$(save_endpoint "$entered" 2>/dev/null); then
+        notify-send -a 'Motion Cues' 'Phone address saved' "$endpoint"
+    else
+        notify-send -a 'Motion Cues' 'Phone address not saved' 'Use a private IP address with an optional port, for example 192.168.1.123:8080.'
+        return 1
+    fi
+}
+
+edit_gyrosc_port() {
+    local current entered result
+    current=$(jq -r '.gyroscPort // 9999' "$settings_file" 2>/dev/null || printf '9999')
+    entered=$(omarchy menu input "GyrOSC UDP port (current: $current)" --width 650) || return 0
+    if [[ ! "$entered" =~ ^[0-9]{4,5}$ ]] || (( 10#$entered < 1024 || 10#$entered > 65535 )); then
+        notify-send -a 'Motion Cues' 'Port not saved' 'Use a number from 1024 to 65535.'
+        return 1
+    fi
+    result=$(omarchy shell motion-cues configure "{\"gyroscPort\":$((10#$entered))}")
+    [[ "$result" == ok ]] || { printf '%s\n' "$result" >&2; return 1; }
+    notify-send -a 'Motion Cues' 'GyrOSC port saved' "Set the same destination port in GyrOSC: $((10#$entered))"
+}
+
+status() {
+    local result
+    if result=$(omarchy shell motion-cues status 2>/dev/null) && jq -e 'type == "object" and .enabled == true' <<< "$result" >/dev/null 2>&1; then
+        printf '%s\n' "$result"
+    else
+        printf '%s\n' '{"enabled":false,"connected":false,"message":"Disabled"}'
+    fi
+}
+
+command_name=${1:-status}
+case "$command_name" in
+    configure) [[ $# == 2 ]] || { echo 'Usage: omarchy-motion-cues configure JSON' >&2; exit 2; } ;;
+    is-setting) [[ $# == 3 ]] || { echo 'Usage: omarchy-motion-cues is-setting KEY JSON-VALUE' >&2; exit 2; } ;;
+    endpoint) [[ $# == 1 || $# == 2 ]] || { echo 'Usage: omarchy-motion-cues endpoint [IP-or-URL]' >&2; exit 2; } ;;
+    *) [[ $# -le 1 ]] || { echo 'Unexpected arguments. Use --help.' >&2; exit 2; } ;;
+esac
+
+case "$command_name" in
+    --help|-h|help)
+        printf '%s\n' 'Usage: omarchy-motion-cues {setup|destination|enable|disable|status|enabled|connected|info|endpoint [IP-or-URL]|edit-endpoint|edit-gyrosc-port|configure JSON|is-setting KEY JSON-VALUE|reconnect}'
+        ;;
+    setup) show_setup ;;
+    destination) connection_details ;;
+    enable) omarchy plugin enable max.motion-cues ;;
+    disable)
+        previous_status=$(status)
+        was_enabled=$(jq -r '.enabled' <<< "$previous_status")
+        previous_toast=$(jq -r '.toastId // 0' <<< "$previous_status")
+        omarchy plugin disable max.motion-cues
+        if [[ "$was_enabled" == true ]]; then
+            notify-send -a 'Motion Cues' --transient --expire-time=3000 --replace-id="$previous_toast" 'Motion Cues disconnected' 'Motion Cues disabled.' || true
+        fi
+        ;;
+    status) status ;;
+    enabled) status | jq -e '.enabled == true' >/dev/null ;;
+    connected) status | jq -e '.connected == true' >/dev/null ;;
+    is-setting)
+        jq -e --arg key "$2" --argjson value "$3" '({provider:"auto",gyroscPort:9999} + .)[$key] == $value' "$settings_file" >/dev/null 2>&1
+        ;;
+    endpoint)
+        if [[ $# == 1 ]]; then
+            jq -er '.url | select(type == "string" and length > 0)' "$settings_file"
+        elif [[ $# == 2 ]]; then
+            save_endpoint "$2"
+        else
+            echo 'Usage: omarchy-motion-cues endpoint [IP-or-URL]' >&2; exit 2
+        fi
+        ;;
+    edit-endpoint) edit_endpoint ;;
+    edit-gyrosc-port) edit_gyrosc_port ;;
+    info)
+        details=$(connection_details compact; printf '\n'; status | jq -r 'if .enabled then .message + "\nApp: " +
+            (if (.detectedApp // "") != "" then .detectedApp else "Not detected yet" end) +
+            " (mode: " + (.provider // "auto") + ")" +
+            (if .provider != "gyrosc" and (.url // "") != "" then "\nphyphox phone address: " + .url else "" end) +
+            (if (.gyroscError // "") != "" then "\n" + .gyroscError else "" end) +
+            "\nPhone position: " + .mount else "Disabled" end')
+        notify-send -a 'Motion Cues' 'Motion Cues' "$details"
+        ;;
+    configure)
+        [[ $# == 2 ]] || { echo 'Usage: omarchy-motion-cues configure JSON' >&2; exit 2; }
+        result=$(omarchy shell motion-cues configure "$2")
+        [[ "$result" == ok ]] || { printf '%s\n' "$result" >&2; exit 1; }
+        ;;
+    reconnect) omarchy shell motion-cues reconnect ;;
+    *) echo 'Usage: omarchy-motion-cues {setup|enable|disable|status|enabled|connected|info|endpoint [IP-or-URL]|edit-endpoint|configure JSON|reconnect}' >&2; exit 2 ;;
+esac
