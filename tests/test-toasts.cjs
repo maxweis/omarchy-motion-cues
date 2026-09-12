@@ -17,7 +17,7 @@ test('Disable sends one transient toast, repeated Disable stays quiet', () => {
     fs.writeFileSync(path.join(directory, 'notify-send'), '#!/bin/bash\nprintf "%s\\n" "$*" >> "$MOTION_TEST_NOTIFICATIONS"\n', {mode:0o755});
     const env = {...process.env, PATH:directory + ':' + process.env.PATH,
         MOTION_TEST_STATE:state, MOTION_TEST_NOTIFICATIONS:log};
-    const run = () => spawnSync('bash', [path.join(__dirname, '..', 'omarchy-motion-cues'), 'disable'], {env, encoding:'utf8'});
+    const run = () => spawnSync('bash', [path.join(__dirname, '..', 'bin/omarchy-motion-cues'), 'disable'], {env, encoding:'utf8'});
     assert.equal(run().status, 0);
     const initial = fs.readFileSync(log, 'utf8');
     assert.match(initial, /--transient --expire-time=3000 --replace-id=73 Motion Cues disconnected/);

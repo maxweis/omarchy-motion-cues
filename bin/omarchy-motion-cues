@@ -5,10 +5,10 @@ config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy"
 settings_file="$config_dir/motion-cues.json"
 script_dir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
 plugin_dir="$HOME/.config/omarchy/plugins/max.motion-cues"
-[[ ! -f "$script_dir/Endpoint.jq" ]] || plugin_dir="$script_dir"
+[[ ! -f "$script_dir/../src/Endpoint.jq" ]] || plugin_dir=$(cd -- "$script_dir/.." && pwd)
 
 show_setup() {
-    [[ -r "$plugin_dir/SETUP.txt" && -r "$plugin_dir/setup_window.py" ]] || {
+    [[ -r "$plugin_dir/docs/SETUP.txt" && -r "$plugin_dir/src/setup_window.py" ]] || {
         echo 'Motion Cues setup guide is missing.' >&2
         return 1
     }
@@ -19,7 +19,7 @@ show_setup() {
     # A separate read-only window works even while the plugin is disabled.
     # Closing or cancelling the guide must not enable it or change settings.
     # Use system Python so a developer's virtual environment cannot hide GTK.
-    connection_details compact | /usr/bin/python3 -B "$plugin_dir/setup_window.py"
+    connection_details compact | /usr/bin/python3 -B "$plugin_dir/src/setup_window.py"
 }
 
 connection_details() {
@@ -41,7 +41,7 @@ connection_details() {
 }
 
 normalize_endpoint() {
-    jq -enr --arg url "$1" -f "$plugin_dir/Endpoint.jq"
+    jq -enr --arg url "$1" -f "$plugin_dir/src/Endpoint.jq"
 }
 
 save_endpoint() {

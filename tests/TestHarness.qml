@@ -1,13 +1,14 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-// Copied alongside a runtime snapshot by test-integration.cjs.
+import "src" as MotionCues
+// Copied with a runtime snapshot that preserves the installed source layout.
 
 ShellRoot {
     Loader {
         id: loader
         active: true
-        sourceComponent: Service {
+        sourceComponent: MotionCues.Service {
             ipcTarget: "motion-cues-test"
             settingsPath: Quickshell.env("MOTION_CUES_TEST_CONFIG")
             renderEnabled: Quickshell.env("MOTION_CUES_TEST_RENDER") === "1"

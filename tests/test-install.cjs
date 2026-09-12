@@ -8,7 +8,7 @@ const source = path.resolve(__dirname, '..');
 const installer = path.join(source, 'scripts/install.py');
 
 test('launcher is executable in the source checkout, matching installed Git permissions', () => {
-    assert.ok(fs.statSync(path.join(source, 'omarchy-motion-cues')).mode & 0o111,
+    assert.ok(fs.statSync(path.join(source, 'bin/omarchy-motion-cues')).mode & 0o111,
         'native installation must not change the tracked launcher mode');
 });
 
@@ -67,6 +67,102 @@ test('empty menus, no trailing comma and comments after the last entry are suppo
         assert.equal(result.status, 0, text + ': ' + result.stderr);
         assert.equal(f.run('--uninstall').status, 0);
     }
+});
+
+test('flat-layout upgrades back up obsolete files and preserve settings and unrelated files', () => {
+    const f = fixture('{}');
+    const plugin = path.join(f.config, 'plugins/max.motion-cues');
+    fs.mkdirSync(plugin, {recursive:true});
+    fs.writeFileSync(path.join(plugin, 'manifest.json'), JSON.stringify({
+        id:'max.motion-cues', version:'1.7.2', entryPoints:{service:'Service.qml'}
+    }));
+    const legacy = ['Service.qml', 'MotionModel.js', 'Settings.js', 'Phyphox.js',
+        'GyrOSC.qml', 'gyrosc_receiver.py', 'BubbleFlow.js', 'Bubble.qml', 'BubbleField.qml',
+        'Endpoint.jq', 'setup_window.py', 'SETUP.txt', 'menu.jsonc', 'omarchy-motion-cues'];
+    for (const name of legacy) fs.writeFileSync(path.join(plugin, name), 'old ' + name);
+    fs.writeFileSync(path.join(plugin, 'my-notes.txt'), 'keep my notes');
+    const result = f.run();
+    assert.equal(result.status, 0, result.stderr);
+    const backups = path.join(f.home, '.local/state/motion-cues/backups');
+    const backup = path.join(backups, fs.readdirSync(backups)[0], 'plugin');
+    for (const name of legacy) {
+        assert.equal(fs.existsSync(path.join(plugin, name)), false, name);
+        assert.equal(fs.readFileSync(path.join(backup, name), 'utf8'), 'old ' + name);
+    }
+    const manifest = JSON.parse(fs.readFileSync(path.join(plugin, 'manifest.json')));
+    assert.equal(manifest.entryPoints.service, 'src/Service.qml');
+    assert.ok(fs.existsSync(path.join(plugin, manifest.entryPoints.service)));
+    assert.ok(fs.existsSync(path.join(plugin, 'scripts/install.py')));
+    assert.equal(fs.readFileSync(path.join(plugin, 'my-notes.txt'), 'utf8'), 'keep my notes');
+    assert.equal(fs.readFileSync(f.settings, 'utf8'), f.original);
+    const cli = spawnSync(path.join(f.home, '.local/bin/omarchy-motion-cues'),
+        ['endpoint', '192.168.1.123:8080'], {encoding:'utf8',
+            env:{...process.env, HOME:f.home, XDG_CONFIG_HOME:path.join(f.home, '.config')}});
+    assert.equal(cli.status, 0, cli.stderr);
+    assert.equal(cli.stdout.trim(), 'http://192.168.1.123:8080');
+    assert.equal(JSON.parse(fs.readFileSync(f.settings)).custom, 'keep');
+});
+
+test('nested deployment paths cannot escape through directory symlinks', () => {
+    for (const name of ['src', 'bin', 'config', 'docs', 'scripts']) {
+        const f = fixture('{}');
+        const plugin = path.join(f.config, 'plugins/max.motion-cues');
+        const outside = path.join(f.home, 'outside');
+        fs.mkdirSync(plugin, {recursive:true});
+        fs.mkdirSync(outside);
+        fs.writeFileSync(path.join(plugin, 'manifest.json'), '{"id":"max.motion-cues"}');
+        fs.symlinkSync(outside, path.join(plugin, name));
+        const result = f.run();
+        assert.notEqual(result.status, 0, name);
+        assert.match(result.stderr, /symlink/);
+        assert.deepEqual(fs.readdirSync(outside), []);
+        assert.equal(fs.readFileSync(f.menu, 'utf8'), '{}');
+        assert.equal(fs.readFileSync(f.settings, 'utf8'), f.original);
+    }
+});
+
+test('release checkout can install itself without dirtying tracked files', () => {
+    const f = fixture('{}');
+    const plugin = path.join(f.config, 'plugins/max.motion-cues');
+    fs.mkdirSync(plugin, {recursive:true});
+    const release = spawnSync('python3', [path.join(source, 'scripts/release.py'),
+        '--output-dir', f.home], {encoding:'utf8'});
+    assert.equal(release.status, 0, release.stderr);
+    const extract = spawnSync('tar', ['-xzf', release.stdout.trim(), '-C', plugin, '--strip-components=1'], {encoding:'utf8'});
+    assert.equal(extract.status, 0, extract.stderr);
+    const git = (...args) => {
+        const result = spawnSync('git', ['-c', 'core.hooksPath=/dev/null', '-C', plugin, ...args], {encoding:'utf8'});
+        assert.equal(result.status, 0, result.stderr);
+        return result.stdout;
+    };
+    git('init', '--quiet');
+    git('add', '.');
+    git('-c', 'user.name=Motion Cues Tests', '-c', 'user.email=tests@example.invalid',
+        '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'Test release snapshot');
+    for (let attempt = 0; attempt < 2; attempt++) {
+        const install = spawnSync('python3', [path.join(plugin, 'scripts/install.py'), '--no-reload'], {
+            encoding:'utf8', env:{...process.env, HOME:f.home,
+                XDG_CONFIG_HOME:path.join(f.home, '.config'), XDG_STATE_HOME:path.join(f.home, '.local/state')}
+        });
+        assert.equal(install.status, 0, install.stderr);
+        assert.equal(git('status', '--porcelain'), '');
+        assert.equal(fs.readFileSync(f.settings, 'utf8'), f.original);
+    }
+});
+
+test('a file in place of a source directory is rejected before updating the installation', () => {
+    const f = fixture('{}');
+    const plugin = path.join(f.config, 'plugins/max.motion-cues');
+    fs.mkdirSync(plugin, {recursive:true});
+    const original = '{"id":"max.motion-cues","version":"1.7.2"}';
+    fs.writeFileSync(path.join(plugin, 'manifest.json'), original);
+    fs.writeFileSync(path.join(plugin, 'src'), 'keep this file');
+    const result = f.run();
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Expected a release directory/);
+    assert.equal(fs.readFileSync(path.join(plugin, 'manifest.json'), 'utf8'), original);
+    assert.equal(fs.readFileSync(path.join(plugin, 'src'), 'utf8'), 'keep this file');
+    assert.equal(fs.readFileSync(f.menu, 'utf8'), '{}');
 });
 
 test('invalid or ambiguous menus are rejected before any installation writes', () => {

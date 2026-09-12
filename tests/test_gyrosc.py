@@ -4,7 +4,7 @@ import struct
 import sys
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from gyrosc_receiver import acceleration, Receiver, G, private_peer
 
 

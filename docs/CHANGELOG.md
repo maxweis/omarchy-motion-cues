@@ -1,7 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.7.3
 
+- Group runtime code in src/, the launcher in bin/, and menu definitions in config/.
+- Move contributor, setup and release documentation out of the repository root.
+- Preserve the directory layout in installations, integration tests and demos;
+  back up and remove obsolete runtime files when upgrading a flat installation.
 - Shorten the README to an explanation, installation and phone setup.
 - Adopt the University of Illinois/NCSA Open Source License.
 

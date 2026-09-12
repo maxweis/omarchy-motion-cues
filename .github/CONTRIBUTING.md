@@ -1,17 +1,17 @@
 # Contributing
 
-Read [architecture](docs/ARCHITECTURE.md) and [testing](docs/TESTING.md) first.
+Read [architecture](../docs/ARCHITECTURE.md) and [testing](../docs/TESTING.md) first.
 Keep changes focused and add a regression test for each fixed bug.
 
 - Preserve explicit, idempotent enable/disable and complete unload cleanup.
 - Keep the center clear and the overlay click-through and keyboard-free.
 - Keep normalization separate from the motion model and animation.
 - Do not add per-frame random noise or unbounded particle pools.
-- Keep endpoint validators in `Settings.js` and `Endpoint.jq` in agreement.
+- Keep endpoint validators in `src/Settings.js` and `src/Endpoint.jq` in agreement.
 - Use private-network fixtures; never require contributors' phones for unit tests.
 - Preserve settings and unrelated menu entries during installation and upgrades.
 - Avoid new runtime dependencies unless the benefit justifies them.
-- Document changes in `CHANGELOG.md` and keep all version fields synchronized.
+- Document changes in `docs/CHANGELOG.md` and keep all version fields synchronized.
 
 Use the surrounding formatting, UTF-8, LF line endings and a final newline. Do
 not reformat unrelated files. Runtime JavaScript must work in both Qt's engine

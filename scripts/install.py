@@ -13,11 +13,34 @@ import tempfile
 PLUGIN_ID = "max.motion-cues"
 SOURCE = Path(__file__).resolve().parent.parent
 RUNTIME_FILES = (
-    "manifest.json", "Service.qml", "MotionModel.js", "Settings.js", "Phyphox.js",
-    "GyrOSC.qml", "gyrosc_receiver.py",
-    "BubbleFlow.js", "Bubble.qml", "BubbleField.qml", "Endpoint.jq", "SETUP.txt", "setup_window.py",
-    "menu.jsonc", "omarchy-motion-cues", "README.md", "LICENSE",
+    "manifest.json", "README.md", "LICENSE", "scripts/install.py",
+    "src/Service.qml", "src/MotionModel.js", "src/Settings.js", "src/Phyphox.js",
+    "src/GyrOSC.qml", "src/gyrosc_receiver.py", "src/BubbleFlow.js", "src/Bubble.qml",
+    "src/BubbleField.qml", "src/Endpoint.jq", "src/setup_window.py",
+    "docs/SETUP.txt", "config/menu.jsonc", "bin/omarchy-motion-cues",
 )
+# Owned files from releases before the source-directory layout. The complete
+# installed plugin is backed up before these obsolete copies are removed.
+LEGACY_RUNTIME_FILES = (
+    "Service.qml", "MotionModel.js", "Settings.js", "Phyphox.js", "GyrOSC.qml",
+    "gyrosc_receiver.py", "BubbleFlow.js", "Bubble.qml", "BubbleField.qml",
+    "Endpoint.jq", "setup_window.py", "SETUP.txt", "menu.jsonc", "omarchy-motion-cues",
+)
+
+
+def checked_file(root, name):
+    """Reject symlinks in nested paths before a deployment can follow them."""
+    path = root / name
+    for component in (path, *path.parents):
+        if component == root:
+            break
+        if component.is_symlink():
+            raise ValueError(f"Refusing symlink in release path: {component}")
+        if component != path and component.exists() and not component.is_dir():
+            raise ValueError(f"Expected a release directory: {component}")
+    if path.exists() and not path.is_file():
+        raise ValueError(f"Expected a regular release file: {path}")
+    return path
 
 
 def jsonc_text(raw, keep_trailing_commas=False):
@@ -175,7 +198,7 @@ def main():
     plugin = config / "plugins" / PLUGIN_ID
     menu = config / "extensions/omarchy-menu.jsonc"
     launcher = home / ".local/bin/omarchy-motion-cues"
-    definitions = json.loads((SOURCE / "menu.jsonc").read_text())
+    definitions = json.loads(checked_file(SOURCE, "config/menu.jsonc").read_text())
     before = menu.read_text() if menu.exists() else "{\n}\n"
     after = update_menu(before, definitions, args.uninstall)
     for target in (plugin, menu, launcher):
@@ -187,15 +210,16 @@ def main():
         raise ValueError("Existing launcher does not belong to Motion Cues")
     if not args.uninstall:
         for name in RUNTIME_FILES:
-            if not (SOURCE / name).is_file() or (SOURCE / name).is_symlink():
+            if not checked_file(SOURCE, name).is_file():
                 raise ValueError(f"Missing or unsafe release file: {name}")
-            if (plugin / name).is_symlink():
-                raise ValueError(f"Refusing to replace symlink: {plugin / name}")
+            checked_file(plugin, name)
+        for name in LEGACY_RUNTIME_FILES:
+            checked_file(plugin, name)
         if not args.no_reload:
             for command in ("omarchy", "quickshell", "bash", "jq", "notify-send", "python3"):
                 if shutil.which(command) is None:
                     raise ValueError(f"Required command is missing: {command}")
-            subprocess.run(["/usr/bin/python3", "-B", str(SOURCE / "setup_window.py"), "--check"], check=True)
+            subprocess.run(["/usr/bin/python3", "-B", str(SOURCE / "src/setup_window.py"), "--check"], check=True)
             subprocess.run(["omarchy", "plugin", "validate", str(SOURCE)], check=True)
     state = Path(os.environ.get("XDG_STATE_HOME", home / ".local/state")) / "motion-cues/backups"
     state.mkdir(parents=True, exist_ok=True)
@@ -221,8 +245,12 @@ def main():
     else:
         plugin.mkdir(parents=True, exist_ok=True)
         for name in RUNTIME_FILES:
-            atomic_write(plugin / name, (SOURCE / name).read_bytes(), 0o755 if name == "omarchy-motion-cues" else 0o644)
-        atomic_write(launcher, (SOURCE / "omarchy-motion-cues").read_bytes(), 0o755)
+            atomic_write(plugin / name, (SOURCE / name).read_bytes(), 0o755 if name == "bin/omarchy-motion-cues" else 0o644)
+        atomic_write(launcher, (SOURCE / "bin/omarchy-motion-cues").read_bytes(), 0o755)
+        for name in LEGACY_RUNTIME_FILES:
+            legacy = checked_file(plugin, name)
+            if legacy.exists():
+                legacy.unlink()
     menu_mode = stat.S_IMODE(menu.stat().st_mode) if menu.exists() else 0o644
     atomic_write(menu, after.encode(), menu_mode)
     if not args.no_reload:

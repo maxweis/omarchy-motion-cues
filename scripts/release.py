@@ -8,12 +8,12 @@ import json
 from pathlib import Path
 import re
 import tarfile
-from install import RUNTIME_FILES, SOURCE
+from install import RUNTIME_FILES, SOURCE, checked_file
 
 PUBLIC_FILES = RUNTIME_FILES + (
     ".gitignore", ".editorconfig", ".github/workflows/test.yml", "package.json",
-    "CONTRIBUTING.md", "CHANGELOG.md", "docs/ARCHITECTURE.md", "docs/TESTING.md",
-    "scripts/install.py", "scripts/release.py", "tests/model.cjs",
+    ".github/CONTRIBUTING.md", "docs/CHANGELOG.md", "docs/ARCHITECTURE.md", "docs/TESTING.md",
+    "scripts/release.py", "tests/model.cjs",
     "tests/TestHarness.qml", "tests/test-model.cjs", "tests/test-flow.cjs",
     "tests/test-dynamic.cjs", "tests/test-endpoint.cjs", "tests/test-toasts.cjs",
     "tests/test-interface.cjs", "tests/test-setup.cjs", "tests/test-install.cjs",
@@ -32,10 +32,15 @@ def validate():
         raise ValueError("Version must use major.minor.patch")
     if json.loads((SOURCE / "package.json").read_text())["version"] != version:
         raise ValueError("Package and manifest versions differ")
-    if f'version: "{version}"' not in (SOURCE / "Service.qml").read_text():
+    entry_point = manifest["entryPoints"]["service"]
+    if entry_point not in RUNTIME_FILES or not entry_point.endswith(".qml"):
+        raise ValueError("Service entry point must be a shipped QML file")
+    if f'version: "{version}"' not in checked_file(SOURCE, entry_point).read_text():
         raise ValueError("Running service and manifest versions differ")
+    if len(set(PUBLIC_FILES)) != len(PUBLIC_FILES):
+        raise ValueError("Public file list contains duplicates")
     for name in PUBLIC_FILES:
-        file = SOURCE / name
+        file = checked_file(SOURCE, name)
         if not file.is_file() or file.is_symlink() or not file.resolve().is_relative_to(SOURCE):
             raise ValueError(f"Missing or unsafe public file: {name}")
         if name.startswith("docs/media/"):
@@ -68,7 +73,7 @@ def main():
                 data = (SOURCE / name).read_bytes()
                 info = tarfile.TarInfo(f"omarchy-motion-cues-{version}/{name}")
                 info.size = len(data)
-                info.mode = 0o755 if name == "omarchy-motion-cues" else 0o644
+                info.mode = 0o755 if name == "bin/omarchy-motion-cues" else 0o644
                 archive.addfile(info, io.BytesIO(data))
     from install import atomic_write
     destination = args.output_dir / f"omarchy-motion-cues-{version}.tar.gz"

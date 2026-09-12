@@ -1,26 +1,42 @@
 # Architecture
 
 Motion Cues is an Omarchy service, not a separate always-running daemon. Enabling
-`max.motion-cues` loads `Service.qml`; disabling it destroys its timers, requests,
+`max.motion-cues` loads `src/Service.qml`; disabling it destroys its timers, requests,
 and overlay windows. Keep the plugin ID stable so existing installations retain
 their enabled state and settings.
+
+## Repository layout
+
+- `src/`: QML service and bubbles, JavaScript models, phone receiver and setup UI.
+- `bin/`: the user-facing launcher; its installed command name stays unchanged.
+- `config/`: Omarchy menu definitions.
+- `docs/`: setup guide, architecture, testing, changelog and public demo media.
+- `demo/`: the illustrative desktop and offscreen renderer.
+- `scripts/`: installation, packaging and demo generation.
+- `tests/`: isolated unit, installation and phone-protocol checks.
+- `.github/`: CI and contributor guidance.
+
+The root keeps `manifest.json` for Omarchy discovery, `package.json` for development
+commands, README and LICENSE. Installations and test snapshots preserve this layout.
+The installer backs up older flat layouts before removing obsolete owned files;
+saved settings, the plugin ID and the installed launcher path do not change.
 
 ## Responsibilities
 
 | File | Responsibility |
 | --- | --- |
-| `Settings.js` | Validate settings and normalize private HTTP endpoints |
-| `Endpoint.jq` | Equivalent endpoint validator for the lightweight Bash CLI |
-| `Phyphox.js` | Request path and conversion from phyphox JSON to normalized samples |
-| `gyrosc_receiver.py` | Bounded OSC decoding, private sender selection, g-to-m/s² conversion, rate limiting |
-| `GyrOSC.qml` | One owned receiver process, port changes, retry, stdout streaming and cleanup |
-| `MotionModel.js` | Pure sensor-to-cue filtering, intensity and reflection calculations |
-| `BubbleFlow.js` | Pure seeded layout, movement, boundary recycling and fades |
-| `Service.qml` | Settings persistence, HTTP lifecycle, notifications, IPC and monitor surfaces |
-| `BubbleField.qml` | Frame clock and the fixed pool of 32 bubble delegates |
-| `Bubble.qml` | Bubble appearance and motion-driven highlights |
-| `omarchy-motion-cues` | Menu actions, explicit enable/disable, endpoint prompt and Setup window |
-| `setup_window.py`, `SETUP.txt` | On-demand, read-only GTK guide with Overview, phyphox and GyrOSC tabs |
+| `src/Settings.js` | Validate settings and normalize private HTTP endpoints |
+| `src/Endpoint.jq` | Equivalent endpoint validator for the lightweight Bash CLI |
+| `src/Phyphox.js` | Request path and conversion from phyphox JSON to normalized samples |
+| `src/gyrosc_receiver.py` | Bounded OSC decoding, private sender selection, g-to-m/s² conversion, rate limiting |
+| `src/GyrOSC.qml` | One owned receiver process, port changes, retry, stdout streaming and cleanup |
+| `src/MotionModel.js` | Pure sensor-to-cue filtering, intensity and reflection calculations |
+| `src/BubbleFlow.js` | Pure seeded layout, movement, boundary recycling and fades |
+| `src/Service.qml` | Settings persistence, HTTP lifecycle, notifications, IPC and monitor surfaces |
+| `src/BubbleField.qml` | Frame clock and the fixed pool of 32 bubble delegates |
+| `src/Bubble.qml` | Bubble appearance and motion-driven highlights |
+| `bin/omarchy-motion-cues` | Menu actions, explicit enable/disable, endpoint prompt and Setup window |
+| `src/setup_window.py`, `docs/SETUP.txt` | On-demand, read-only GTK guide with Overview, phyphox and GyrOSC tabs |
 | `scripts/install.py` | Per-user deployment, recoverable removal and scoped JSONC menu merging |
 
 JavaScript modules use the Qt-compatible language subset and expose CommonJS

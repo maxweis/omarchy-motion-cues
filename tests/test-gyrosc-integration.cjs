@@ -37,9 +37,7 @@ async function main() {
     const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'motion-cues-osc-'));
     const harness = path.join(directory, 'shell.qml');
     const config = path.join(directory, 'settings.json');
-    for (const name of ['Service.qml','Settings.js','Phyphox.js','GyrOSC.qml','gyrosc_receiver.py',
-        'MotionModel.js','Bubble.qml','BubbleField.qml','BubbleFlow.js'])
-        await fs.copyFile(path.join(source,name), path.join(directory,name));
+    await fs.cp(path.join(source, 'src'), path.join(directory, 'src'), {recursive:true});
     await fs.copyFile(path.join(__dirname,'TestHarness.qml'), harness);
     await fs.mkdir(path.join(directory,'bin'));
     await fs.writeFile(path.join(directory,'bin/notify-send'), '#!/bin/sh\nprintf "73\\n"\n', {mode:0o755});

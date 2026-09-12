@@ -21,8 +21,8 @@ shows real diagnostics. No private files, accounts or notifications are included
 
 ![Short Motion Cues demonstration](media/motion-cues.gif)
 
-This 14-second demonstration uses the real `Bubble.qml`, `BubbleField.qml`,
-`BubbleFlow.js` and `MotionModel.js` with a simulated motion sequence. The
+This 14-second demonstration uses the real `src/Bubble.qml`, `src/BubbleField.qml`,
+`src/BubbleFlow.js` and `src/MotionModel.js` with a simulated motion sequence. The
 backdrop is a presentation, not an additional settings screen. No private
 desktop, phone readings or network addresses are recorded.
 
@@ -57,7 +57,7 @@ The sensor adapters, settings validation, motion filtering and particle animatio
 are separate modules. The project includes protocol, lifecycle, installer and
 rendered integration tests, CI, and a reproducible release packager.
 
-[Architecture](ARCHITECTURE.md) · [Contributing](../CONTRIBUTING.md) · [Testing](TESTING.md)
+[Architecture](ARCHITECTURE.md) · [Contributing](../.github/CONTRIBUTING.md) · [Testing](TESTING.md)
 
 ## A note on expectations
 

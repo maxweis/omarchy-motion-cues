@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 
 TAB_TITLES = ("Overview", "phyphox setup", "GyrOSC setup")
-GUIDE = Path(__file__).with_name("SETUP.txt")
+GUIDE = Path(__file__).resolve().parent.parent / "docs/SETUP.txt"
 
 
 def load_pages(destination, guide=GUIDE):

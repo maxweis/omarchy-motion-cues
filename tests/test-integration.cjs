@@ -36,12 +36,10 @@ async function main() {
     await new Promise(r => server.listen(0, '127.0.0.1', r));
     const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'motion-cues-test-'));
     // Every run gets a separate QML config, IPC identity and source snapshot.
-    // Quickshell intentionally does not load parent-directory QML imports.
+    // Preserve the installed directory layout so path regressions fail here too.
     const harness = path.join(directory, 'shell.qml');
     await fs.copyFile(path.join(__dirname, 'TestHarness.qml'), harness);
-    for (const name of ['Service.qml', 'MotionModel.js', 'Settings.js', 'Phyphox.js',
-        'BubbleFlow.js', 'BubbleField.qml', 'Bubble.qml', 'GyrOSC.qml', 'gyrosc_receiver.py'])
-        await fs.copyFile(path.join(source, name), path.join(directory, name));
+    await fs.cp(path.join(source, 'src'), path.join(directory, 'src'), {recursive:true});
     const configRoot = path.join(directory, 'config');
     await fs.mkdir(path.join(configRoot, 'omarchy'), {recursive:true});
     const configFile = path.join(configRoot, 'omarchy', 'motion-cues.json');
@@ -232,7 +230,7 @@ async function main() {
         while (!heldResponses.length && Date.now() < heldDeadline) await delay(10);
         assert.ok(heldResponses.length, 'old endpoint must have a request in flight');
         mode = 'live';
-        await exec('bash', [path.join(__dirname, '..', 'omarchy-motion-cues'), 'endpoint', replacementUrl], {
+        await exec('bash', [path.join(source, 'bin/omarchy-motion-cues'), 'endpoint', replacementUrl], {
             env:{...process.env, XDG_CONFIG_HOME:configRoot}, timeout:3000});
         const switched = await until(s => s.connected && s.url === replacementUrl);
         for (const response of heldResponses)

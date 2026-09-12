@@ -2,7 +2,7 @@
 
 ## Fast checks
 
-Development dependencies: Node.js 20+, Python 3, Bash and jq. No `npm install`
+Development dependencies: Node.js 20+, Python 3, Bash, jq, Git and tar. No `npm install`
 is necessary; the project has no npm dependencies.
 
 ```sh
@@ -12,7 +12,8 @@ npm run release
 
 Unit tests cover validation, directions, stale timestamps, density, reflections,
 seeded animation, frame-rate independence, CLI actions, setup and installation.
-Installer tests use temporary home directories, never the real desktop.
+Installer tests use temporary home directories, never the real desktop. They also
+cover upgrades from the old flat layout and reject symlinked source subdirectories.
 GitHub Actions runs these checks on Linux. A passing CI job does not validate QML
 or the compositor; those require the desktop checks below.
 
@@ -27,7 +28,8 @@ npm run test:gyrosc
 
 This starts a separate Quickshell instance with isolated settings, unique IPC
 configuration, simulated local HTTP endpoints and a notification recorder. The
-real phone and installed plugin settings are not modified. Temporary diagnostics
+source snapshot preserves the `src/` layout. The real phone and installed plugin
+settings are not modified. Temporary diagnostics
 remain outside the source directory and their locations are printed at the end.
 
 The suite exercises live/paused/stale/malformed/HTTP-error/timeout responses,
@@ -65,6 +67,10 @@ to confirm the empty input region and no keyboard capture. Optionally set
 desktop content: keep them out of issues and releases unless sanitized.
 
 ## Before a release
+
+To check demo generation without overwriting published media, pass a temporary
+output directory: `npm run demo -- /tmp/motion-cues-preview`. This renders fictional
+windows offscreen, not a capture of the current desktop.
 
 1. Run fast and graphical checks. Test fresh install, update and removal.
 2. Run `omarchy plugin validate .` on a supported Omarchy desktop.

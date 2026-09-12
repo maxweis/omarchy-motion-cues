@@ -215,7 +215,7 @@ Item {
 
     function status() {
         return JSON.stringify({ enabled: true, connected: connected, message: message,
-            version: "1.7.2", connectionPhase: connectionPhase, toasts: toastCount, toastId: toastId,
+            version: "1.7.3", connectionPhase: connectionPhase, toasts: toastCount, toastId: toastId,
             provider: config.provider, detectedApp: activeProvider, gyroscPort: config.gyroscPort,
             gyroscListening: gyrosc.listening, gyroscError: gyrosc.error, gyroscProcessId: gyrosc.processId,
             url: config.url, mount: config.mount, sensitivity: config.sensitivity,

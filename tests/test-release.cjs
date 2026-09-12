@@ -6,6 +6,17 @@ const {spawnSync} = require('node:child_process');
 const temporary = require('./temporary.cjs');
 const root = path.resolve(__dirname, '..');
 
+test('manifest resolves the source entry point and metadata agrees on version and license', () => {
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json')));
+    const metadata = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
+    assert.equal(manifest.entryPoints.service, 'src/Service.qml');
+    assert.ok(fs.existsSync(path.join(root, manifest.entryPoints.service)));
+    assert.equal(manifest.version, metadata.version);
+    assert.equal(manifest.license, 'NCSA');
+    assert.equal(metadata.license, manifest.license);
+    assert.match(fs.readFileSync(path.join(root, 'LICENSE'), 'utf8'), /^University of Illinois\/NCSA Open Source License/);
+});
+
 test('public archive is reproducible, complete, and excludes local state', () => {
     const directory = temporary('motion-cues-release-');
     const run = () => spawnSync('python3', [path.join(root,'scripts/release.py'), '--output-dir', directory], {encoding:'utf8'});
@@ -20,6 +31,15 @@ test('public archive is reproducible, complete, and excludes local state', () =>
     assert.match(list.stdout, /scripts\/install.py/);
     assert.match(list.stdout, /tests\/test-integration.cjs/);
     assert.match(list.stdout, /LICENSE/);
+    assert.match(list.stdout, /src\/Service.qml/);
+    assert.match(list.stdout, /bin\/omarchy-motion-cues/);
+    assert.match(list.stdout, /config\/menu.jsonc/);
+    assert.match(list.stdout, /docs\/SETUP.txt/);
+    assert.match(list.stdout, /docs\/CHANGELOG.md/);
+    assert.match(list.stdout, /\.github\/CONTRIBUTING.md/);
+    assert.doesNotMatch(list.stdout, /omarchy-motion-cues-[^/]+\/(?:Service.qml|omarchy-motion-cues|menu.jsonc|SETUP.txt)\n/);
+    const entries = list.stdout.trim().split('\n');
+    assert.equal(new Set(entries).size, entries.length, 'no duplicate archive entries');
     assert.match(list.stdout, /docs\/media\/motion-cues.gif/);
     assert.match(list.stdout, /docs\/media\/showcase.png/);
     assert.match(list.stdout, /docs\/media\/desktop.gif/);
@@ -29,7 +49,7 @@ test('public archive is reproducible, complete, and excludes local state', () =>
 });
 
 test('new installations have no default phone; malformed settings cannot silently use defaults', () => {
-    const S = require('../Settings.js');
+    const S = require('../src/Settings.js');
     assert.equal(S.settings({}).url, '');
     assert.equal(S.settings({}).provider, 'auto');
     assert.equal(S.settings({}).gyroscPort, 9999);
@@ -45,7 +65,7 @@ test('CLI rejects extra arguments and safely compares JSON setting values', () =
     const directory = temporary('motion-cues-cli-');
     fs.mkdirSync(path.join(directory, 'omarchy'));
     fs.writeFileSync(path.join(directory, 'omarchy/motion-cues.json'), '{"mount":"flat","sensitivity":0.5}');
-    const run = args => spawnSync('bash',[path.join(root,'omarchy-motion-cues'),...args],
+    const run = args => spawnSync('bash',[path.join(root,'bin/omarchy-motion-cues'),...args],
         {encoding:'utf8', env:{...process.env,XDG_CONFIG_HOME:directory}});
     assert.equal(run(['--help']).status, 0);
     assert.equal(run(['enable','unexpected']).status, 2);

@@ -1,5 +1,6 @@
 import QtQuick
-import "MotionModel.js" as Motion
+import "../src/MotionModel.js" as Motion
+import "../src" as MotionCues
 
 // Public demo backdrop, not an additional plugin interface. The bubble components
 // and motion model are copied unchanged from the runtime by render-demo.sh.
@@ -167,7 +168,7 @@ Rectangle {
         stage: root.stage
     }
 
-    BubbleField {
+    MotionCues.BubbleField {
         id: field
         anchors.fill: parent
         // The export timer advances the actual flow model at a fixed cadence.
