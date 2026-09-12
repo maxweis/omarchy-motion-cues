@@ -7,6 +7,11 @@ const {spawnSync} = require('node:child_process');
 const source = path.resolve(__dirname, '..');
 const installer = path.join(source, 'scripts/install.py');
 
+test('launcher is executable in the source checkout, matching installed Git permissions', () => {
+    assert.ok(fs.statSync(path.join(source, 'omarchy-motion-cues')).mode & 0o111,
+        'native installation must not change the tracked launcher mode');
+});
+
 function fixture(menuText) {
     const home = temporary('motion cues install-');
     const config = path.join(home, '.config/omarchy');

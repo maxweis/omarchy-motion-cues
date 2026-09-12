@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.2
+
+- Preserve executable launcher permissions in Git, so installing the menu from
+  a native Omarchy checkout does not leave it modified and interfere with updates.
+- Add the illustrative example desktop with the actual bubble renderer.
+
 ## 1.7.1
 
 - Prepare the first public GitHub release with native Omarchy installation and
