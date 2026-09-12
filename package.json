@@ -3,7 +3,7 @@
   "version": "1.7.2",
   "private": true,
   "description": "Phone-driven peripheral motion cues for Omarchy",
-  "license": "MIT",
+  "license": "NCSA",
   "repository": { "type": "git", "url": "https://github.com/maxweis/omarchy-motion-cues.git" },
   "homepage": "https://github.com/maxweis/omarchy-motion-cues#readme",
   "bugs": { "url": "https://github.com/maxweis/omarchy-motion-cues/issues" },

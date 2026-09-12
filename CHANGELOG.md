@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Shorten the README to an explanation, installation and phone setup.
+- Adopt the University of Illinois/NCSA Open Source License.
+
 ## 1.7.2
 
 - Preserve executable launcher permissions in Git, so installing the menu from
