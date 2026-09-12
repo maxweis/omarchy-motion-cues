@@ -11,6 +11,9 @@ test('manifest resolves the source entry point and metadata agrees on version an
     const metadata = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
     assert.equal(manifest.entryPoints.service, 'src/Service.qml');
     assert.ok(fs.existsSync(path.join(root, manifest.entryPoints.service)));
+    const service = fs.readFileSync(path.join(root, manifest.entryPoints.service), 'utf8');
+    assert.match(service, /property int inactivityTimeoutMs: 5 \* 60 \* 1000/);
+    assert.match(service, /Qt\.resolvedUrl\("\.\.\/bin\/omarchy-motion-cues"\)/);
     assert.equal(manifest.version, metadata.version);
     assert.equal(manifest.license, 'NCSA');
     assert.equal(metadata.license, manifest.license);

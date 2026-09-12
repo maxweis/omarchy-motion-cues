@@ -49,4 +49,7 @@ If Setup cannot open, install its dependencies with
 `omarchy pkg add python-gobject gtk4`. Use **Connection status** to check the feed
 or **Disable** to turn the cues off.
 
+After five minutes without fresh motion data, the plugin disables itself.
+Choose **Enable** to reconnect. A stationary phone still counts while sending data.
+
 Licensed under the [University of Illinois/NCSA Open Source License](LICENSE).

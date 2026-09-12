@@ -16,6 +16,13 @@ Item {
     property bool alive: true
     property bool ready: false
     property bool connected: false
+    // Tests override the deadline and command only in their isolated QML harness.
+    property int inactivityTimeoutMs: 5 * 60 * 1000
+    readonly property string inactivityLauncherPath: decodeURIComponent(
+        Qt.resolvedUrl("../bin/omarchy-motion-cues").toString().replace(/^file:\/\//, ""))
+    property var inactivityDisableCommand: ["bash", inactivityLauncherPath, "disable-inactive"]
+    property double lastMotionAt: Date.now()
+    property bool inactivityExpired: false
     property string activeProvider: ""
     property var providerSamples: ({})
     property string connectionPhase: ""
@@ -96,6 +103,7 @@ Item {
     }
 
     function loadConfig(raw) {
+        if (inactivityExpired) return;
         try {
             var parsed = JSON.parse(raw);
             var next = Settings.settings(parsed);
@@ -168,6 +176,7 @@ Item {
         if (!next.fresh) return;
         sampleCount++;
         lastAdvance = Date.now();
+        lastMotionAt = lastAdvance;
         staleTimer.restart();
         connected = true;
         message = "Live phone motion";
@@ -213,9 +222,30 @@ Item {
         pollTimer.restart();
     }
 
+    function checkInactivity() {
+        if (!alive || inactivityExpired) return;
+        var remaining = inactivityTimeoutMs - Math.max(0, Date.now() - lastMotionAt);
+        if (remaining > 0) {
+            // Check only at the previous deadline, not once per sensor sample.
+            inactivityTimer.interval = Math.max(1, Math.ceil(remaining));
+            inactivityTimer.restart();
+            return;
+        }
+        inactivityExpired = true;
+        ready = false;
+        pollTimer.stop();
+        cancelRequest();
+        resetFeed("Disabled after 5 minutes without motion data", false);
+        // The command must survive destruction of this service when Omarchy
+        // persists enabled=false. An owned Process would be killed on unload.
+        Quickshell.execDetached(inactivityDisableCommand);
+    }
+
     function status() {
         return JSON.stringify({ enabled: true, connected: connected, message: message,
-            version: "1.7.3", connectionPhase: connectionPhase, toasts: toastCount, toastId: toastId,
+            version: "1.7.4", connectionPhase: connectionPhase, toasts: toastCount, toastId: toastId,
+            inactivityTimeoutMs: inactivityTimeoutMs, inactivityExpired: inactivityExpired,
+            inactivityRemainingMs: Math.max(0, inactivityTimeoutMs - Math.max(0, Date.now() - lastMotionAt)),
             provider: config.provider, detectedApp: activeProvider, gyroscPort: config.gyroscPort,
             gyroscListening: gyrosc.listening, gyroscError: gyrosc.error, gyroscProcessId: gyrosc.processId,
             url: config.url, mount: config.mount, sensitivity: config.sensitivity,
@@ -237,13 +267,13 @@ Item {
         port: root.config.gyroscPort
         onSample: function(value) { root.acceptSample(value, "gyrosc"); }
         onListeningChanged: {
-            if (!listening && root.alive && root.activeProvider === "gyrosc") {
+            if (!listening && root.alive && !root.inactivityExpired && root.activeProvider === "gyrosc") {
                 root.resetFeed("GyrOSC receiver stopped; retrying automatically");
                 root.schedulePoll(1);
             }
         }
         onErrorChanged: {
-            if (error && !root.connected && (root.config.provider === "gyrosc" || !root.config.url))
+            if (error && !root.inactivityExpired && !root.connected && (root.config.provider === "gyrosc" || !root.config.url))
                 root.message = error;
         }
     }
@@ -271,6 +301,11 @@ Item {
 
     // One-shot deadlines: no 20 Hz polling or repeating watchdog during backoff.
     Timer {
+        id: inactivityTimer
+        interval: root.inactivityTimeoutMs
+        onTriggered: { root.timerWakeups++; root.checkInactivity(); }
+    }
+    Timer {
         id: pollTimer
         onTriggered: { root.timerWakeups++; root.poll(); }
     }
@@ -296,8 +331,10 @@ Item {
         }
     }
 
+    Component.onCompleted: inactivityTimer.start()
     Component.onDestruction: {
         alive = false;
+        inactivityTimer.stop();
         cancelRequest();
     }
 

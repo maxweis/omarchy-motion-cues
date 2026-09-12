@@ -1,6 +1,6 @@
 {
   "name": "omarchy-motion-cues",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "private": true,
   "description": "Phone-driven peripheral motion cues for Omarchy",
   "license": "NCSA",
@@ -12,6 +12,7 @@
     "test": "node --test tests/test-model.cjs tests/test-flow.cjs tests/test-dynamic.cjs tests/test-endpoint.cjs tests/test-toasts.cjs tests/test-interface.cjs tests/test-setup.cjs tests/test-install.cjs tests/test-release.cjs && python3 -B -m unittest discover -s tests -p 'test_*.py'",
     "test:integration": "node tests/test-integration.cjs",
     "test:gyrosc": "node tests/test-gyrosc-integration.cjs",
+    "test:inactivity": "node tests/test-inactivity-integration.cjs",
     "test:render": "MOTION_CUES_TEST_RENDER=1 node tests/test-integration.cjs",
     "check": "bash -n bin/omarchy-motion-cues scripts/render-demo.sh && npm test",
     "release": "python3 scripts/release.py",

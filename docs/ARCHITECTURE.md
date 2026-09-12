@@ -76,6 +76,11 @@ Forward acceleration drives cues down; braking drives them up.
 - One HTTP request in flight, with request starts spaced at least about 50 ms.
 - One-shot request timeout: 800 ms. Failed requests retry after 1000 ms.
 - One-shot stale-data timeout: 900 ms after the last advancing sample.
+- Auto-disable after 300000 ms without an advancing sample, starting at enable.
+  Valid stationary readings extend the deadline; stale/invalid data, configuration
+  changes and retries do not. A separate timestamp survives feed resets. A one-shot
+  timer checks at each deadline instead of restarting on every sample. The detached
+  launcher persists the disabled state through Omarchy and survives service unload.
 - No periodic watchdog or 20 Hz wakeups during retry backoff.
 - No HTTP requests before a valid address is configured. Auto/GyrOSC mode can
   listen without an address; missing settings use Auto defaults. Malformed settings

@@ -24,6 +24,7 @@ Run from a graphical Linux session with Quickshell and Wayland available:
 ```sh
 npm run test:integration
 npm run test:gyrosc
+npm run test:inactivity
 ```
 
 This starts a separate Quickshell instance with isolated settings, unique IPC
@@ -43,6 +44,11 @@ two-way failover, explicit providers, missing URL, invalid configuration, port
 changes/conflicts/recovery and socket release on unload/exit. The fast checks
 include Python unit tests for malformed OSC, bundles, bounds and sender pinning.
 No physical phone is simulated as a verified locked-screen test: test that manually.
+
+The inactivity suite uses a shortened deadline in an isolated harness. It checks
+initial connection failure, stationary feeds, recovery, stale/malformed data,
+configuration changes and socket/request cleanup. Test shutdown commands target
+only the harness, never the installed plugin. The production deadline is five minutes.
 
 ## Visible checks
 

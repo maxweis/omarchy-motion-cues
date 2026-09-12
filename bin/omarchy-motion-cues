@@ -119,13 +119,17 @@ case "$command_name" in
     setup) show_setup ;;
     destination) connection_details ;;
     enable) omarchy plugin enable max.motion-cues ;;
-    disable)
+    disable|disable-inactive)
         previous_status=$(status)
         was_enabled=$(jq -r '.enabled' <<< "$previous_status")
         previous_toast=$(jq -r '.toastId // 0' <<< "$previous_status")
         omarchy plugin disable max.motion-cues
         if [[ "$was_enabled" == true ]]; then
-            notify-send -a 'Motion Cues' --transient --expire-time=3000 --replace-id="$previous_toast" 'Motion Cues disconnected' 'Motion Cues disabled.' || true
+            disable_message='Motion Cues disabled.'
+            if [[ "$command_name" == disable-inactive ]]; then
+                disable_message='No motion data for 5 minutes. Enable Motion Cues to reconnect.'
+            fi
+            notify-send -a 'Motion Cues' --transient --expire-time=3000 --replace-id="$previous_toast" 'Motion Cues disconnected' "$disable_message" || true
         fi
         ;;
     status) status ;;

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.4
+
+- Disable the plugin after five minutes without fresh motion data, including
+  when enabled without a connected phone. Stop both transports and show a toast.
+- Keep stationary feeds active; retries and stale or invalid data do not extend
+  the deadline. Re-enable explicitly after automatic shutdown.
+
 ## 1.7.3
 
 - Group runtime code in src/, the launcher in bin/, and menu definitions in config/.

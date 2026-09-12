@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "max.motion-cues",
   "name": "Motion Cues",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "author": "maxweis",
   "license": "NCSA",
   "description": "Click-through peripheral bubbles with automatic phyphox or GyrOSC motion input.",

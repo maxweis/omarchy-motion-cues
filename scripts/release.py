@@ -19,6 +19,7 @@ PUBLIC_FILES = RUNTIME_FILES + (
     "tests/test-interface.cjs", "tests/test-setup.cjs", "tests/test-install.cjs",
     "tests/test-release.cjs", "tests/test-integration.cjs", "tests/temporary.cjs",
     "tests/test_gyrosc.py", "tests/test-gyrosc-integration.cjs", "tests/test_setup.py",
+    "tests/test-inactivity-integration.cjs",
     "docs/SHOWCASE.md", "docs/media/motion-cues.gif", "docs/media/showcase.png",
     "demo/Showcase.qml", "demo/ExampleDesktop.qml", "demo/render.cpp", "scripts/render-demo.sh",
     "docs/media/desktop.gif", "docs/media/desktop.png",
