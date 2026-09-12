@@ -5,9 +5,10 @@ phone running **phyphox** or **GyrOSC**, with automatic feed detection.
 Twelve base bubbles flow with acceleration and turns;
 up to twenty extras appear during stronger motion. The center stays clear.
 
-![Motion Cues: bubbles flow, reverse, and settle around the screen edges](docs/media/motion-cues.gif)
+![Motion Cues running over an example desktop](docs/media/desktop.gif)
 
-*Actual plugin renderer with simulated motion. [View the showcase](docs/SHOWCASE.md).*
+*Actual bubble renderer over an illustrative desktop, with simulated motion.
+[View the showcase and focused demo](docs/SHOWCASE.md).*
 
 This is an experimental visual aid, not a medically validated treatment or a
 copy of Apple's implementation. Use only as a passenger. Stop if it feels worse.

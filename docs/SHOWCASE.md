@@ -7,6 +7,18 @@ Twelve quiet bubbles sit near the edges. During a turn they flow, fade out,
 and reappear; stronger acceleration adds more. Their highlights follow the
 motion, and the center of the screen stays clear.
 
+## On an example desktop
+
+![Motion cues running over an example desktop](media/desktop.gif)
+
+Fictional notes and a terminal show how peripheral cues leave the center of a
+working desktop usable. The desktop, bar and app windows are illustrative;
+the bubbles are the actual plugin components running a simulated motion sequence.
+This is not a recording of the owner's desktop or a claim that the terminal
+shows real diagnostics. No private files, accounts or notifications are included.
+
+## A closer look
+
 ![Short Motion Cues demonstration](media/motion-cues.gif)
 
 This 14-second demonstration uses the real `Bubble.qml`, `BubbleField.qml`,
@@ -65,6 +77,8 @@ npm run demo
 ```
 
 The renderer uses an offscreen window and deterministic motion. It never records
-your desktop. It replaces only the two demo assets in `docs/media/`.
+your desktop. It replaces the two GIFs and two stills in `docs/media/`.
+
+![Example desktop with motion cues](media/desktop.png)
 
 ![Motion Cues showcase still](media/showcase.png)

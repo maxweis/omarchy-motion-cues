@@ -20,7 +20,8 @@ PUBLIC_FILES = RUNTIME_FILES + (
     "tests/test-release.cjs", "tests/test-integration.cjs", "tests/temporary.cjs",
     "tests/test_gyrosc.py", "tests/test-gyrosc-integration.cjs", "tests/test_setup.py",
     "docs/SHOWCASE.md", "docs/media/motion-cues.gif", "docs/media/showcase.png",
-    "demo/Showcase.qml", "demo/render.cpp", "scripts/render-demo.sh",
+    "demo/Showcase.qml", "demo/ExampleDesktop.qml", "demo/render.cpp", "scripts/render-demo.sh",
+    "docs/media/desktop.gif", "docs/media/desktop.png",
 )
 
 
@@ -37,7 +38,7 @@ def validate():
         file = SOURCE / name
         if not file.is_file() or file.is_symlink() or not file.resolve().is_relative_to(SOURCE):
             raise ValueError(f"Missing or unsafe public file: {name}")
-        if name in ("docs/media/motion-cues.gif", "docs/media/showcase.png"):
+        if name.startswith("docs/media/"):
             data = file.read_bytes()
             signature = b"GIF89a" if name.endswith(".gif") else b"\x89PNG\r\n\x1a\n"
             if not data.startswith(signature) or len(data) > 5 * 1024 * 1024:

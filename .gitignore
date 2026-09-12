@@ -11,6 +11,8 @@ motion-cues.json
 *.gif
 !docs/media/showcase.png
 !docs/media/motion-cues.gif
+!docs/media/desktop.gif
+!docs/media/desktop.png
 *.mp4
 node_modules/
 dist/

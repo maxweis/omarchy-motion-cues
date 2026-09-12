@@ -22,8 +22,10 @@ test('public archive is reproducible, complete, and excludes local state', () =>
     assert.match(list.stdout, /LICENSE/);
     assert.match(list.stdout, /docs\/media\/motion-cues.gif/);
     assert.match(list.stdout, /docs\/media\/showcase.png/);
+    assert.match(list.stdout, /docs\/media\/desktop.gif/);
+    assert.match(list.stdout, /docs\/media\/desktop.png/);
     assert.doesNotMatch(list.stdout, /backups|\.env|VERIFICATION|motion-cues\.json/);
-    assert.equal(list.stdout.split('\n').filter(line => /\.(png|gif)$/.test(line)).length, 2);
+    assert.equal(list.stdout.split('\n').filter(line => /\.(png|gif)$/.test(line)).length, 4);
 });
 
 test('new installations have no default phone; malformed settings cannot silently use defaults', () => {

@@ -9,11 +9,12 @@
 
 int main(int argc, char **argv) {
     QGuiApplication app(argc, argv);
-    if (argc != 3) return 2;
+    if (argc != 3 && argc != 4) return 2;
     QQuickWindow::setSceneGraphBackend("software");
     QQuickView view;
     view.setSource(QUrl::fromLocalFile(QString::fromLocal8Bit(argv[1])));
     if (view.status() != QQuickView::Ready) return 1;
+    view.rootObject()->setProperty("desktopExample", argc == 4);
     view.show();
     const QDir frames(QString::fromLocal8Bit(argv[2]));
     QTimer timer;
