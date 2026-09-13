@@ -5,7 +5,7 @@
   "version": "1.7.4",
   "author": "maxweis",
   "license": "NCSA",
-  "description": "Click-through peripheral bubbles with automatic phyphox or GyrOSC motion input.",
+  "description": "Phone-driven motion cues for using a laptop as a passenger in a moving car.",
   "kinds": ["service"],
   "entryPoints": { "service": "src/Service.qml" }
 }

@@ -21,14 +21,18 @@ wirelessly to the laptop. [View the showcase](docs/SHOWCASE.md).*
 
 ## Install or update
 
-Requires Omarchy with Quickshell plugin support.
+Requires Omarchy with Quickshell plugin support, Python 3, Bash/coreutils, `jq`,
+`libnotify`, and `iproute2`. The setup window also needs `python-gobject` and
+`gtk4`. Phone app requirements are below.
 
 ```sh
 omarchy plugin add https://github.com/maxweis/omarchy-motion-cues.git
 python3 "$HOME/.config/omarchy/plugins/max.motion-cues/scripts/install.py"
 ```
 
-The second command adds the launcher and **Motion Cues** menu. To update later:
+The second command adds the launcher and **Motion Cues** menu, backing up the
+affected files and preserving unrelated menu entries. It does not enable the
+plugin. To update later:
 
 ```sh
 omarchy plugin update max.motion-cues
@@ -57,5 +61,15 @@ or **Disable** to turn the cues off.
 
 After five minutes without fresh motion data, the plugin disables itself.
 Choose **Enable** to reconnect. A stationary phone still counts while sending data.
+
+## Remove
+
+```sh
+python3 "$HOME/.config/omarchy/plugins/max.motion-cues/scripts/install.py" --uninstall
+```
+
+This disables the plugin and removes its menu, launcher, and installed files.
+Settings and recoverable backups are retained. If you added a GyrOSC firewall
+rule, remove that rule separately as described in Setup.
 
 Licensed under the [University of Illinois/NCSA Open Source License](LICENSE).
