@@ -5,13 +5,19 @@ see a still screen but your inner ear senses movement. Moving cues around the
 screen edges may help by reducing that mismatch.
 [How motion cues work](https://www.apple.com/newsroom/2024/05/apple-announces-new-accessibility-features-including-eye-tracking/).
 
-This plugin brings phone-driven motion bubbles to **Omarchy, a Linux
-distribution**, while leaving your work visible and clickable. It is experimental,
-not a medically validated treatment. For passengers only; stop if it feels worse.
+This plugin brings motion bubbles to **Omarchy, a Linux distribution**, while
+leaving your work visible and clickable. The bubbles are driven by **a connected
+phone's accelerometer**, with motion data sent wirelessly to the laptop. Most
+laptops do not have a built-in accelerometer, so a phone supplies the motion
+readings.
 
-![Motion Cues running over an example desktop](docs/media/desktop.gif)
+It is experimental, not a medically validated treatment. For passengers only;
+stop if it feels worse.
 
-*Example desktop with simulated motion. [View the showcase](docs/SHOWCASE.md).*
+![Motion cues on a passenger's laptop, with synchronized steering, scenery, and wireless phone readings.](https://raw.githubusercontent.com/maxweis/omarchy-motion-cues/main/docs/media/alternatives/motion-cues-realistic.gif)
+
+*AI-generated passenger view with simulated motion. The phone sends acceleration
+wirelessly to the laptop. [View the showcase](docs/SHOWCASE.md).*
 
 ## Install or update
 

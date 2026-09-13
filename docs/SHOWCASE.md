@@ -7,6 +7,38 @@ Twelve quiet bubbles sit near the edges. During a turn they flow, fade out,
 and reappear; stronger acceleration adds more. Their highlights follow the
 motion, and the center of the screen stays clear.
 
+## See the connection
+
+![A passenger's laptop and phone in a moving car, with synchronized road movement, phone acceleration readings, a wireless data link, and on-screen bubbles](media/motion-cues.gif)
+
+The 20-second loop shows a laptop on a passenger's lap and a phone sending
+accelerometer readings over local Wi-Fi. The road and speedometer show the car
+speeding up, coasting, turning both ways, braking, and stopping.
+
+- Speeding up: bubbles drift down.
+- Turning right: bubbles drift left; turning left: they drift right.
+- Braking: bubbles drift up.
+- Steady speed or stopped: bubbles settle, even while the phone keeps streaming.
+
+The car, phone interface, and wireless signal are illustrations. The bubbles
+use the actual plugin renderer, driven by the same simulated acceleration as
+the phone readings and car motion. No private desktop or real sensor data is
+recorded. This is a demonstration, not a recording of a road test.
+
+## Realistic passenger view
+
+[Watch the GIF](https://github.com/maxweis/omarchy-motion-cues/blob/main/docs/media/alternatives/motion-cues-realistic.gif)
+or [the smoother MP4](https://github.com/maxweis/omarchy-motion-cues/blob/main/docs/media/alternatives/motion-cues-realistic.mp4).
+
+The README's default animation shows a black PC-style laptop in an AI-generated
+car interior. The steering wheel,
+road, scenery, phone readings, and bubbles follow the same simulated drive,
+including slowing to a complete stop. This is not recorded driving footage.
+
+[Source, prompts, and rebuild instructions](https://github.com/maxweis/omarchy-motion-cues/tree/main/demo/alternatives/realistic-v2)
+are included in the Git repository. These larger alternative assets are kept
+out of the lightweight plugin archive.
+
 ## On an example desktop
 
 ![Motion cues running over an example desktop](media/desktop.gif)
@@ -16,15 +48,6 @@ working desktop usable. The desktop, bar and app windows are illustrative;
 the bubbles are the actual plugin components running a simulated motion sequence.
 This is not a recording of the owner's desktop or a claim that the terminal
 shows real diagnostics. No private files, accounts or notifications are included.
-
-## A closer look
-
-![Short Motion Cues demonstration](media/motion-cues.gif)
-
-This 14-second demonstration uses the real `src/Bubble.qml`, `src/BubbleField.qml`,
-`src/BubbleFlow.js` and `src/MotionModel.js` with a simulated motion sequence. The
-backdrop is a presentation, not an additional settings screen. No private
-desktop, phone readings or network addresses are recorded.
 
 ## What you get
 
@@ -78,6 +101,8 @@ npm run demo
 
 The renderer uses an offscreen window and deterministic motion. It never records
 your desktop. It replaces the two GIFs and two stills in `docs/media/`.
+To render just the car scene elsewhere, use
+`npm run demo -- /tmp/motion-cues-preview showcase`.
 
 ![Example desktop with motion cues](media/desktop.png)
 

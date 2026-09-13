@@ -7,6 +7,8 @@ Rectangle {
     color: "#17212b"
     property int stage: 0
     readonly property var phases: ["At rest", "Turning", "Changing direction", "Braking", "Settling"]
+    property string phaseTitle: phases[stage]
+    property string phaseDescription: ["Twelve quiet bubbles. No animation at rest.", "Bubbles flow through a sustained turn, fading as they leave.", "Movement reverses, and the highlights follow.", "More bubbles appear during stronger acceleration.", "Extra bubbles fade. The movement comes to rest."][stage]
 
     Rectangle {
         x: 50
@@ -312,13 +314,13 @@ Rectangle {
                 font.letterSpacing: 3
             }
             Text {
-                text: desktop.phases[desktop.stage]
+                text: desktop.phaseTitle
                 color: "#e2ecf0"
                 font.pixelSize: 33
                 font.weight: Font.DemiBold
             }
             Text {
-                text: ["Twelve quiet bubbles. No animation at rest.", "Bubbles flow through a sustained turn, fading as they leave.", "Movement reverses, and the highlights follow.", "More bubbles appear during stronger acceleration.", "Extra bubbles fade. The movement comes to rest."][desktop.stage]
+                text: desktop.phaseDescription
                 width: parent.width
                 wrapMode: Text.WordWrap
                 lineHeight: 1.25

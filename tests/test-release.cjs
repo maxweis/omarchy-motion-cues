@@ -47,6 +47,9 @@ test('public archive is reproducible, complete, and excludes local state', () =>
     assert.match(list.stdout, /docs\/media\/showcase.png/);
     assert.match(list.stdout, /docs\/media\/desktop.gif/);
     assert.match(list.stdout, /docs\/media\/desktop.png/);
+    assert.match(list.stdout, /demo\/CarShowcase.qml/);
+    assert.match(list.stdout, /demo\/DriveSequence.js/);
+    assert.match(list.stdout, /tests\/test-demo.cjs/);
     assert.doesNotMatch(list.stdout, /backups|\.env|VERIFICATION|motion-cues\.json/);
     assert.equal(list.stdout.split('\n').filter(line => /\.(png|gif)$/.test(line)).length, 4);
 });

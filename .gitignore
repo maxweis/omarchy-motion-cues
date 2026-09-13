@@ -14,6 +14,14 @@ motion-cues.json
 !docs/media/desktop.gif
 !docs/media/desktop.png
 *.mp4
+# Explicitly reviewed, synthetic assets for the realistic showcase alternative.
+!demo/alternatives/realistic-v2/cabin-linux.png
+!demo/alternatives/realistic-v2/ground.png
+!demo/alternatives/realistic-v2/panorama.png
+!demo/alternatives/realistic-v2/wheel.png
+!docs/media/alternatives/motion-cues-realistic.gif
+!docs/media/alternatives/motion-cues-realistic.mp4
+!docs/media/alternatives/motion-cues-realistic.png
 node_modules/
 dist/
 __pycache__/

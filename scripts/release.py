@@ -22,6 +22,7 @@ PUBLIC_FILES = RUNTIME_FILES + (
     "tests/test-inactivity-integration.cjs",
     "docs/SHOWCASE.md", "docs/media/motion-cues.gif", "docs/media/showcase.png",
     "demo/Showcase.qml", "demo/ExampleDesktop.qml", "demo/render.cpp", "scripts/render-demo.sh",
+    "demo/CarShowcase.qml", "demo/DriveSequence.js", "tests/test-demo.cjs",
     "docs/media/desktop.gif", "docs/media/desktop.png",
 )
 

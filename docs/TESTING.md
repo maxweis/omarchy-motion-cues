@@ -76,7 +76,12 @@ desktop content: keep them out of issues and releases unless sanitized.
 
 To check demo generation without overwriting published media, pass a temporary
 output directory: `npm run demo -- /tmp/motion-cues-preview`. This renders fictional
-windows offscreen, not a capture of the current desktop.
+windows and a passenger-seat car scene offscreen, not a capture of the current
+desktop. Add `showcase` as the second argument to render only the car GIF.
+Inspect each phase: the phone readings and bubble direction must agree with the
+caption, scenery must continue moving at steady speed, and the wireless data
+path must stay active when stopped. Fast tests check the shared driving sequence
+against the runtime motion model. Public GIFs must remain below 5 MiB each.
 
 1. Run fast and graphical checks. Test fresh install, update and removal.
 2. Run `omarchy plugin validate .` on a supported Omarchy desktop.

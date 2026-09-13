@@ -9,7 +9,7 @@
   "bugs": { "url": "https://github.com/maxweis/omarchy-motion-cues/issues" },
   "engines": { "node": ">=20" },
   "scripts": {
-    "test": "node --test tests/test-model.cjs tests/test-flow.cjs tests/test-dynamic.cjs tests/test-endpoint.cjs tests/test-toasts.cjs tests/test-interface.cjs tests/test-setup.cjs tests/test-install.cjs tests/test-release.cjs && python3 -B -m unittest discover -s tests -p 'test_*.py'",
+    "test": "node --test tests/test-model.cjs tests/test-flow.cjs tests/test-dynamic.cjs tests/test-endpoint.cjs tests/test-toasts.cjs tests/test-interface.cjs tests/test-setup.cjs tests/test-install.cjs tests/test-release.cjs tests/test-demo.cjs && python3 -B -m unittest discover -s tests -p 'test_*.py'",
     "test:integration": "node tests/test-integration.cjs",
     "test:gyrosc": "node tests/test-gyrosc-integration.cjs",
     "test:inactivity": "node tests/test-inactivity-integration.cjs",
